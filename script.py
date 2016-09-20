@@ -5,6 +5,7 @@ from wand.color import Color
 import os, sys, getopt
 from os.path import isfile, join
 
+# <editor-fold desc="iOS and Android folders structure to create">
 root = 'MagickIcons'
 androin_folder = 'MagickIcons/Android'
 ios_folder = 'MagickIcons/iOS/'
@@ -14,6 +15,7 @@ xhdpi_android_folder = 'MagickIcons/Android/drawable-xhdpi/'
 xxhdpi_android_folder = 'MagickIcons/Android/drawable-xxhdpi/'
 xxxhdpi_android_folder = 'MagickIcons/Android/drawable-xxxhdpi/'
 
+# <editor-fold desc="Screen-scale dictionary">
 dimension_scales = {
     mdpi_android_folder: 1,
     hdpi_android_folder: 1.5,
@@ -21,41 +23,55 @@ dimension_scales = {
     xxhdpi_android_folder: 3,
     xxxhdpi_android_folder: 4
 }
+# </editor-fold>
 
+# list with all folders to create
 folders_paths = {root, androin_folder, ios_folder, mdpi_android_folder, hdpi_android_folder, xhdpi_android_folder,
                  xxhdpi_android_folder, xxxhdpi_android_folder}
 
 
+# <editor-fold desc="Main method which performs actions to convert image due input parameters">
 def convert_image(image_to_convert_path, destination_path, color, width, height, scale):
+    # open input image
     with Image(filename=image_to_convert_path) as icon_to_convert:
+        # start drawing
         with Drawing() as draw:
             with icon_to_convert.clone() as clone:
+                # color input image into specified color
                 draw.fill_color = color
                 draw.color(0, 0, 'reset')
                 draw.draw(clone)
                 icon_to_convert.composite_channel('default_channels', clone, 'atop')
-
+                # create empty image with width=120 and height=120
                 with Image(width=120, height=120) as output_image:
+                    # calculating scale factor depends on input image's width and height
                     if icon_to_convert.height >= icon_to_convert.width:
                         scale_factor = output_image.height / float(icon_to_convert.height)
                     else:
                         scale_factor = output_image.width / float(icon_to_convert.width)
 
                     with icon_to_convert.clone() as badge:
+                        # resizing input image due to new scale factor
                         scaled_width = int(scale_factor * icon_to_convert.width)
                         scaled_height = int(scale_factor * icon_to_convert.height)
                         badge.resize(width=scaled_width, height=scaled_height)
 
+                        # compposing badge and output_image images, keep badge in the center
                         output_image.composite(badge, left=(output_image.width - badge.width) / 2,
                                                top=(output_image.height - badge.height) / 2)
 
+                        # final image resizing to specified width, height and scale and saving
                         output_image.resize(width=int(width*scale), height=int(height*scale))
                         save_image(output_image, destination_path)
+# </editor-fold>
 
 
+# <editor-fold desc="method for saving image to specified directory. create new image with different name if
+# image with specified name already exists">
 def save_image(image, path):
     i = 1
     while os.path.exists(path):
+        # different behaviour for Android and iOS image
         if '@' in path:
             separator = '@'
         else:
@@ -66,18 +82,21 @@ def save_image(image, path):
         i += 1
 
     image.save(filename=path)
+# </editor-fold>
 
-
+# creates files structure
 def create_files_structure():
     for path in folders_paths:
         if not os.path.exists(path):
             os.makedirs(path)
 
 if __name__ == "__main__":
+    # command line default values
     image_to_convert = ''
     color = ''
     width = 25
     height = 25
+    # reading command line parameters and parsing them
     try:
         opts, args = getopt.getopt(sys.argv[1:], "i:c:w:h:", ["icon=", "color=", "width=", "height="])
     except getopt.GetoptError:
@@ -98,6 +117,7 @@ if __name__ == "__main__":
         elif opt in ("-h", "--height"):
             height = int(arg)
 
+    # image_to_convert and color should be specified as parameters otherwise exit
     if image_to_convert == '':
         print('Choose image to convert')
         sys.exit()
@@ -106,6 +126,7 @@ if __name__ == "__main__":
         sys.exit()
 
     create_files_structure()
+    # converting and creating images for all required screens
     for path, scale in dimension_scales.items():
         convert_image(image_to_convert, path + image_to_convert, color, width, height, scale)
         if scale == 1 or scale == 2 or scale == 3:
