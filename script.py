@@ -50,7 +50,22 @@ def convert_image(image_to_convert_path, destination_path, color, width, height,
                                                top=(output_image.height - badge.height) / 2)
 
                         output_image.resize(width=int(width*scale), height=int(height*scale))
-                        output_image.save(filename=destination_path)
+                        save_image(output_image, destination_path)
+
+
+def save_image(image, path):
+    i = 1
+    while os.path.exists(path):
+        if '@' in path:
+            separator = '@'
+        else:
+            separator = '.'
+        name = path.split(separator)[0]
+        ending = path.split(separator)[1]
+        path = name + "-{0}".format(i) + separator + ending
+        i += 1
+
+    image.save(filename=path)
 
 
 def create_files_structure():
@@ -64,28 +79,24 @@ if __name__ == "__main__":
     width = 25
     height = 25
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:a:c:w:hh:d", ["iconvert=", "all", "color=", "width=", "height=", "directory="])
+        opts, args = getopt.getopt(sys.argv[1:], "i:c:w:h:", ["icon=", "color=", "width=", "height="])
     except getopt.GetoptError:
         print('script.py -i <image_to_convert> -c <color(for example: blue, red, #787878)>, -w <width(25 by default)>, '
               '--height <height(25 by default)>')
         sys.exit(2)
     for opt, arg in opts:
-        if opt == '-h':
+        if opt == '--help':
             print('script.py -i <image_to_convert> -c <color(for example: blue, red, #787878)>, -w <width(25 by default)>, '
                   '--height <height(25 by default)>')
             sys.exit()
-        elif opt in ("-i", "--iconvert"):
+        elif opt in ("-i", "--icon"):
             image_to_convert = arg
         elif opt in ("-c", "--color"):
             color = Color(arg)
         elif opt in ("-w", "--width"):
             width = int(arg)
-        elif opt in ("-hh", "--height"):
+        elif opt in ("-h", "--height"):
             height = int(arg)
-        elif opt in ("-a", "--all"):
-            convert_all = True
-        elif opt in ("-d", "--directory"):
-            directory = arg
 
     if image_to_convert == '':
         print('Choose image to convert')
@@ -100,5 +111,7 @@ if __name__ == "__main__":
         if scale == 1 or scale == 2 or scale == 3:
             img_name = image_to_convert.split('.')[0]
             img_extension = image_to_convert.split('.')[1]
-            convert_image(image_to_convert, ios_folder + "{0}@{1}.{2}".format(img_name, scale, img_extension),
-                          color, width, height, scale)
+            new_name = "{0}@{1}x.{2}".format(img_name, scale, img_extension)
+            if scale == 1:
+                new_name = image_to_convert
+            convert_image(image_to_convert, ios_folder + new_name, color, width, height, scale)
