@@ -1,19 +1,20 @@
+# Author Nick Zaretskyy(koljazaretsky@gmail.com)
+
 from __future__ import print_function
 from wand.image import Image
 from wand.drawing import Drawing
 from wand.color import Color
 import os, sys, getopt
-from os.path import isfile, join
 
 # <editor-fold desc="iOS and Android folders structure to create">
 root = 'MagickIcons'
 androin_folder = 'MagickIcons/Android'
 ios_folder = 'MagickIcons/iOS/'
-mdpi_android_folder = 'MagickIcons/Android/drawable-mdpi/'
-hdpi_android_folder = 'MagickIcons/Android/drawable-hdpi/'
-xhdpi_android_folder = 'MagickIcons/Android/drawable-xhdpi/'
-xxhdpi_android_folder = 'MagickIcons/Android/drawable-xxhdpi/'
-xxxhdpi_android_folder = 'MagickIcons/Android/drawable-xxxhdpi/'
+mdpi_android_folder = 'MagickIcons/Android/drawable-mdpi'
+hdpi_android_folder = 'MagickIcons/Android/drawable-hdpi'
+xhdpi_android_folder = 'MagickIcons/Android/drawable-xhdpi'
+xxhdpi_android_folder = 'MagickIcons/Android/drawable-xxhdpi'
+xxxhdpi_android_folder = 'MagickIcons/Android/drawable-xxxhdpi'
 
 # <editor-fold desc="Screen-scale dictionary">
 dimension_scales = {
@@ -84,6 +85,7 @@ def save_image(image, path):
     image.save(filename=path)
 # </editor-fold>
 
+
 # creates files structure
 def create_files_structure():
     for path in folders_paths:
@@ -101,12 +103,12 @@ if __name__ == "__main__":
         opts, args = getopt.getopt(sys.argv[1:], "i:c:w:h:", ["icon=", "color=", "width=", "height="])
     except getopt.GetoptError:
         print('script.py -i <image_to_convert> -c <color(for example: blue, red, #787878)>, -w <width(25 by default)>, '
-              '--height <height(25 by default)>')
+              '-h <height(25 by default)>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '--help':
             print('script.py -i <image_to_convert> -c <color(for example: blue, red, #787878)>, -w <width(25 by default)>, '
-                  '--height <height(25 by default)>')
+                  '-h <height(25 by default)>')
             sys.exit()
         elif opt in ("-i", "--icon"):
             image_to_convert = arg
