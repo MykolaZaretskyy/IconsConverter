@@ -1,17 +1,10 @@
 # Author Nick Zaretskyy(koljazaretsky@gmail.com)
 
 import os, sys, getopt
-from wand.color import Color
 
 image_extension_to_convert = ['.png', '.jpg', '.jpeg']
 
 if __name__ == "__main__":
-    # try:
-    #     directory_path = sys.argv[1]
-    # except IndexError:
-    #     print('Input directory path as the first parameter')
-    #     sys.exit()
-
     directory_path = ''
     extension = ''
     color = ''
@@ -34,7 +27,7 @@ if __name__ == "__main__":
             width = int(arg)
         elif opt in ("-h", "--height"):
             height = int(arg)
-        elif opt in ("-h", "--height"):
+        elif opt == "-e":
             extension = arg
         elif opt == "-d":
             directory_path = arg
@@ -54,5 +47,10 @@ if __name__ == "__main__":
     for img_file in files:
         for ext in image_extension_to_convert:
             if img_file.endswith(ext):
+                # verifying if name contains symbols '(' ')', if so replace them
+                if '(' in img_file:
+                    img_file = img_file.replace("(", "'(")
+                if ')' in img_file:
+                    img_file = img_file.replace(")", ")'")
                 full_img_path = directory_path+img_file
                 os.system("python script.py -i {0} -c {1} -w {2} -h {3}".format(full_img_path, color, width, height))
