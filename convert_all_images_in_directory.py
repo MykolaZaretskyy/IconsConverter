@@ -2,6 +2,7 @@
 
 import os, sys, getopt
 
+# image extensions that could be converted in a specified folder
 image_extension_to_convert = ['.png', '.jpg', '.jpeg']
 
 if __name__ == "__main__":
@@ -44,6 +45,7 @@ if __name__ == "__main__":
     if extension != '':
         image_extension_to_convert = [extension]
 
+    # go through all files in a folder, if file's extension is one of specified - convert image
     for img_file in files:
         for ext in image_extension_to_convert:
             if img_file.endswith(ext):
